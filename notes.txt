@@ -1,0 +1,14 @@
+FIX ALL PROBLEMS:
+    yarn eslint --fix src --ext .js
+
+RUN MIGRATIONS:
+    yarn sequelize db:migrate
+
+CREATE MIGRATIONS:
+    yarn sequelize migration:create --name=create-users
+
+REMOVE LAST MIGRATE:
+    yarn sequelize db:migrate:undo
+
+REMOVE ALL MIGRATES:
+    yarn sequelize db:migrate:undo:all
