@@ -24,7 +24,7 @@ class ForgotPasswordController {
                 return res.status(400).send({ error: 'User not found' });
             }
 
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = crypto.randomBytes(3).toString('hex');
 
             const now = new Date();
 
@@ -68,6 +68,7 @@ class ForgotPasswordController {
 
     async update(req, res) {
         const schema = Yup.object().shape({
+            token: Yup.string().min(6),
             password: Yup.string().min(6),
             confirmPassword: Yup.string().when('password', (password, field) =>
                 password ? field.required().oneOf([Yup.ref('password')]) : field
@@ -78,8 +79,7 @@ class ForgotPasswordController {
             return res.status(400).json({ error: 'There is something wrong' });
         }
 
-        const { password } = req.body;
-        const { token } = req.params;
+        const { token, password } = req.body;
 
         try {
             const user = await User.findOne({

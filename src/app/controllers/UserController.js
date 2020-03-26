@@ -55,7 +55,7 @@ class UserController {
             return res.status(400).json({ error: 'There is something wrong' });
         }
 
-        const { email, oldPassword } = req.body;
+        const { name, email, oldPassword } = req.body;
 
         const user = await User.findByPk(req.userId);
 
@@ -71,9 +71,9 @@ class UserController {
             return res.status(400).json({ error: 'Password does not match' });
         }
 
-        await user.save();
+        await user.update(req.body);
 
-        const { id, name } = await User.findByPk(req.userId);
+        const { id } = await User.findByPk(req.userId);
 
         return res.json({ id, name, email });
     }
