@@ -17,65 +17,105 @@ class UserController {
             ),
         });
 
-        if (!(await schema.isValid(req.body))) {
-            return res.status(400).json({ error: 'There is something wrong' });
-        }
+        try {
+            if (!(await schema.isValid(req.body))) {
+                return res
+                    .status(400)
+                    .json({ error: 'There is something wrong' });
+            }
 
-        const userExists = await User.findOne({
-            where: { email: req.body.email },
-        });
-
-        if (userExists) {
-            return res.status(400).json({ error: 'User already exists' });
-        }
-
-        // const { id, name, email } = await User.create(req.body);
-        const user = await User.create(req.body);
-
-        // return res.json({ id, name, email });
-        return res.json(user);
-    }
-
-    async update(req, res) {
-        const schema = Yup.object().shape({
-            name: Yup.string(),
-            email: Yup.string().email(),
-            oldPassword: Yup.string().min(6),
-            password: Yup.string()
-                .min(6)
-                .when('oldPassword', (oldPassword, field) =>
-                    oldPassword ? field.required() : field
-                ),
-            confirmPassword: Yup.string().when('password', (password, field) =>
-                password ? field.required().oneOf([Yup.ref('password')]) : field
-            ),
-        });
-
-        if (!(await schema.isValid(req.body))) {
-            return res.status(400).json({ error: 'There is something wrong' });
-        }
-
-        const { name, email, oldPassword } = req.body;
-
-        const user = await User.findByPk(req.userId);
-
-        if (email !== user.email) {
-            const userExists = await User.findOne({ where: { email } });
+            const userExists = await User.findOne({
+                where: { email: req.body.email },
+            });
 
             if (userExists) {
                 return res.status(400).json({ error: 'User already exists' });
             }
+
+            // const { id, name, email } = await User.create(req.body);
+            const user = await User.create(req.body);
+
+            // return res.json({ id, name, email });
+            return res.json(user);
+        } catch (err) {
+            return res.status(400).json({ error: 'There is something wrong' });
         }
+    }
 
-        if (oldPassword && !(await user.checkPassoword(oldPassword))) {
-            return res.status(400).json({ error: 'Password does not match' });
+    async update(req, res) {
+        const schema = Yup.object().shape({
+            name: Yup.string().required(),
+            email: Yup.string().email().required(),
+            oldPassword: Yup.string().min(6).required(),
+            password: Yup.string()
+                .min(6)
+                .when('oldPassword', (oldPassword, field) =>
+                    oldPassword ? field.required() : field
+                )
+                .required(),
+            confirmPassword: Yup.string()
+                .when('password', (password, field) =>
+                    password
+                        ? field.required().oneOf([Yup.ref('password')])
+                        : field
+                )
+                .required(),
+        });
+
+        try {
+            if (!(await schema.isValid(req.body))) {
+                return res
+                    .status(400)
+                    .json({ error: 'There is something wrong' });
+            }
+
+            const { name, email, oldPassword, password } = req.body;
+
+            const user = await User.findByPk(req.userId);
+
+            if (email !== user.email) {
+                const userExists = await User.findOne({ where: { email } });
+
+                if (userExists) {
+                    return res
+                        .status(400)
+                        .json({ error: 'User already exists' });
+                }
+            }
+
+            if (oldPassword && !(await user.checkPassoword(oldPassword))) {
+                return res
+                    .status(400)
+                    .json({ error: 'Password does not match' });
+            }
+
+            if (oldPassword === password) {
+                return res.status(400).json({
+                    error:
+                        'An old password cannot be the same as a new password',
+                });
+            }
+
+            await user.update(req.body);
+
+            const { id } = await User.findByPk(req.userId);
+
+            return res.json({ id, name, email });
+        } catch (err) {
+            return res.status(400).json({ error: 'There is something wrong' });
         }
+    }
 
-        await user.update(req.body);
+    async destroy(req, res) {
+        try {
+            const user = await User.findByPk(req.userId);
 
-        const { id } = await User.findByPk(req.userId);
+            await user.destroy();
 
-        return res.json({ id, name, email });
+            return res.status(200).json({ success: 'Deleted user' });
+        } catch (err) {
+            return res.status(400).json({ error: 'Error deleting user' });
+        }
     }
 }
 

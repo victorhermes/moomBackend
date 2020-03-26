@@ -13,5 +13,6 @@ routes.post('/recovery', ForgotPasswordController.update);
 
 routes.use(authMiddlewares);
 routes.put('/update-user', UserController.update);
+routes.delete('/delete-user', UserController.destroy);
 
 export default routes;
