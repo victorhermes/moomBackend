@@ -22,7 +22,7 @@ class ForgotPasswordController {
             });
 
             if (!user) {
-                return res.status(404).send({ error: 'User not found' });
+                return res.status(400).send({ error: 'User not found' });
             }
 
             const token = crypto.randomBytes(20).toString('hex');
@@ -36,17 +36,28 @@ class ForgotPasswordController {
                 password_reset_date: now,
             });
 
-            Mail.sendMail({
-                to: `${user.name} <${email}>`,
-                subject: 'Recuperação de senha',
-                template: 'forgot-password',
-                context: {
-                    name: user.name,
-                    token,
+            Mail.sendMail(
+                {
+                    to: `${user.name} <${email}>`,
+                    subject: 'Recuperação de senha',
+                    template: 'forgot-password',
+                    context: {
+                        name: user.name,
+                        token,
+                    },
                 },
-            });
+                (err) => {
+                    if (err) {
+                        return res
+                            .status(400)
+                            .send({ error: 'Unable to send email' });
+                    }
+
+                    return res.send();
+                }
+            );
         } catch (err) {
-            return res.status(404).send({ error: 'Error on forgot password' });
+            return res.status(400).send({ error: 'Error on forgot password' });
         }
     }
 }
