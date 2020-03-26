@@ -12,6 +12,9 @@ class UserController {
                 .when('oldPassword', (oldPassword, field) =>
                     oldPassword ? field.required() : field
                 ),
+            confirmPassword: Yup.string().when('password', (password, field) =>
+                password ? field.required().oneOf([Yup.ref('password')]) : field
+            ),
         });
 
         if (!(await schema.isValid(req.body))) {
@@ -68,7 +71,7 @@ class UserController {
             return res.status(400).json({ error: 'Password does not match' });
         }
 
-        await user.update(req.body);
+        await user.save();
 
         const { id, name } = await User.findByPk(req.userId);
 

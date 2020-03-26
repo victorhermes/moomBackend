@@ -9,6 +9,7 @@ const routes = new Router();
 routes.post('/create-user', UserController.store);
 routes.post('/login', SessionController.store);
 routes.post('/forgot-password', ForgotPasswordController.store);
+routes.post('/recovery-password/:token', ForgotPasswordController.update);
 
 routes.use(authMiddlewares);
 routes.put('/update-user', UserController.update);

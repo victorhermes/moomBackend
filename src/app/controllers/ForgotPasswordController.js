@@ -1,9 +1,7 @@
 import * as Yup from 'yup';
 import crypto from 'crypto';
-import { format, parseISO } from 'date-fns';
-import pt from 'date-fns/locale/pt';
-import Mail from '../../lib/Mail';
 import User from '../models/User';
+import Mail from '../../lib/Mail';
 
 class ForgotPasswordController {
     async store(req, res) {
@@ -14,6 +12,7 @@ class ForgotPasswordController {
         if (!(await schema.isValid(req.body))) {
             return res.status(400).json({ error: 'There is something wrong' });
         }
+
         const { email } = req.body;
 
         try {
@@ -31,10 +30,10 @@ class ForgotPasswordController {
 
             now.setHours(now.getHours() + 1);
 
-            await user.update({
-                password_reset_token: token,
-                password_reset_date: now,
-            });
+            user.password_reset_token = token;
+            user.password_reset_date = now;
+
+            await user.save();
 
             Mail.sendMail(
                 {
@@ -56,8 +55,56 @@ class ForgotPasswordController {
                     return res.send();
                 }
             );
+
+            return res
+                .status(200)
+                .send({ success: 'Password recovery email was sent' });
         } catch (err) {
-            return res.status(400).send({ error: 'Error on forgot password' });
+            return res
+                .status(400)
+                .send({ error: 'Error on recovery password' });
+        }
+    }
+
+    async update(req, res) {
+        const schema = Yup.object().shape({
+            password: Yup.string().min(6),
+            confirmPassword: Yup.string().when('password', (password, field) =>
+                password ? field.required().oneOf([Yup.ref('password')]) : field
+            ),
+        });
+
+        if (!(await schema.isValid(req.body))) {
+            return res.status(400).json({ error: 'There is something wrong' });
+        }
+
+        const { password } = req.body;
+        const { token } = req.params;
+
+        try {
+            const user = await User.findOne({
+                where: { password_reset_token: token },
+            });
+
+            const now = new Date();
+
+            if (now > user.password_reset_date) {
+                return res.status(400).send({ error: 'Expired token' });
+            }
+
+            user.password_reset_token = null;
+            user.password_reset_date = null;
+            user.password = password;
+
+            await user.save();
+
+            return res
+                .status(200)
+                .send({ success: 'Password has been recovered' });
+        } catch (err) {
+            return res
+                .status(400)
+                .send({ error: 'Error on recovery password' });
         }
     }
 }
