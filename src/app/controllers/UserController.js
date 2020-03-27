@@ -6,12 +6,7 @@ class UserController {
         const schema = Yup.object().shape({
             name: Yup.string().required(),
             email: Yup.string().email().required(),
-            password: Yup.string()
-                .required()
-                .min(6)
-                .when('oldPassword', (oldPassword, field) =>
-                    oldPassword ? field.required() : field
-                ),
+            password: Yup.string().required().min(6),
             confirmPassword: Yup.string().when('password', (password, field) =>
                 password ? field.required().oneOf([Yup.ref('password')]) : field
             ),
@@ -32,10 +27,8 @@ class UserController {
                 return res.status(400).json({ error: 'User already exists' });
             }
 
-            // const { id, name, email } = await User.create(req.body);
             const user = await User.create(req.body);
 
-            // return res.json({ id, name, email });
             return res.json(user);
         } catch (err) {
             return res.status(400).json({ error: 'There is something wrong' });
