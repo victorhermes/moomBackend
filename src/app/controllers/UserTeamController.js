@@ -10,6 +10,7 @@ class UserTeamController {
             confirmPassword: Yup.string().when('password', (password, field) =>
                 password ? field.required().oneOf([Yup.ref('password')]) : field
             ),
+            change_password_next_login: Yup.boolean().required(),
         });
 
         try {

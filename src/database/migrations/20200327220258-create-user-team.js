@@ -30,6 +30,7 @@ module.exports = {
             change_password_next_login: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
