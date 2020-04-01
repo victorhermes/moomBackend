@@ -27,6 +27,14 @@ class UserTeam extends Model {
         return this;
     }
 
+    static associate(models) {
+        this.belongsToMany(models.Role, {
+            foreignKey: 'user_id',
+            through: 'role_user_team',
+            as: 'roles',
+        });
+    }
+
     checkPassoword(password) {
         return bcrypt.compare(password, this.password_hash);
     }
