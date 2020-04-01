@@ -30,6 +30,8 @@ class SessionController {
 
         const { id, name } = user;
 
+        res.cookie('userEmail', email);
+
         return res.json({
             user_team: {
                 id,

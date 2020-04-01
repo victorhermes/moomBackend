@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authMiddlewares from './app/middlewares/auth';
-import can from './app/middlewares/acl';
+import is from './app/middlewares/acl';
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import ForgotPasswordController from './app/controllers/ForgotPasswordController';
@@ -25,17 +25,9 @@ routes.put('/roles/:id', RoleController.update);
 
 routes.use(authMiddlewares);
 
-routes.get(
-    '/permissions',
-    can(['administrator', 'visitor']),
-    PermissionController.index
-);
+routes.get('/permissions', is(['visitor']), PermissionController.index);
 routes.post('/permissions', PermissionController.store);
-routes.put(
-    '/permissions/:id',
-    can(['visitor', 'administrator']),
-    PermissionController.update
-);
+routes.put('/permissions/:id', is(['visitor']), PermissionController.update);
 
 routes.get('/role', RoleController.index);
 routes.put('/update-user', UserController.update);

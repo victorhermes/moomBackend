@@ -1,14 +1,17 @@
 import UserTeam from '../models/UserTeam';
 import Role from '../models/Role';
 
-const can = (roles) => {
+const is = (roles) => {
     return async (req, res, next) => {
         if (roles === undefined) {
             return next();
         }
 
         const user = await UserTeam.findOne({
-            where: { id: req.userId },
+            where: {
+                email: req.cookies.userEmail,
+                id: req.userId,
+            },
             attributes: { exclude: ['createdAt', 'updatedAt'] },
             include: [
                 {
@@ -21,6 +24,12 @@ const can = (roles) => {
                 },
             ],
         });
+
+        if (!user) {
+            return res.status(401).json({
+                error: `Você não tem permissão. Só para: ${roles}`,
+            });
+        }
 
         const userRole = user.roles.map((n) => {
             return n.dataValues.slug;
@@ -40,4 +49,4 @@ const can = (roles) => {
     };
 };
 
-module.exports = can;
+module.exports = is;
