@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authMiddlewares from './app/middlewares/auth';
-import { is, can } from './app/middlewares/protect';
+import { is } from './app/middlewares/acl';
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import ForgotPasswordController from './app/controllers/ForgotPasswordController';
