@@ -1,8 +1,8 @@
 import UserTeam from '../models/UserTeam';
-import Role from '../models/Role';
 import Permission from '../models/Permission';
+import Role from '../models/Role';
 
-const is = (roles) => {
+export function is(roles) {
     return async (req, res, next) => {
         if (roles === undefined) {
             return next();
@@ -48,11 +48,9 @@ const is = (roles) => {
             error: `Você não tem permissão. Só para: ${roles}`,
         });
     };
-};
+}
 
-module.exports = is;
-
-/* const can = (permissions) => {
+export function can(permissions) {
     return async (req, res, next) => {
         if (permissions === undefined) {
             return next();
@@ -87,10 +85,10 @@ module.exports = is;
         });
 
         const permission = permissions.filter((r) => {
-            return r === userPermission.toString();
+            return userPermission.includes(r);
         });
 
-        if (userPermission.toString() === permission.toString()) {
+        if (permission.length > 0) {
             return next();
         }
 
@@ -98,6 +96,4 @@ module.exports = is;
             error: `Você não tem permissão. Só para: ${permissions}`,
         });
     };
-};
-
-module.exports = can; */
+}

@@ -33,6 +33,12 @@ class UserTeam extends Model {
             through: 'role_user_team',
             as: 'roles',
         });
+
+        this.belongsToMany(models.Permission, {
+            foreignKey: 'user_id',
+            through: 'permission_user_team',
+            as: 'permissions',
+        });
     }
 
     checkPassoword(password) {
