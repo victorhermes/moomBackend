@@ -2,7 +2,7 @@ import UserTeam from '../models/UserTeam';
 import Permission from '../models/Permission';
 import Role from '../models/Role';
 
-// is(['administrator', 'visitor'])
+// is(['administrator'])
 export function is(roles) {
     return async (req, res, next) => {
         if (roles === undefined) {
