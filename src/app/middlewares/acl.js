@@ -3,7 +3,7 @@ import Permission from '../models/Permission';
 import Role from '../models/Role';
 
 // is(['administrator'])
-export function is(roles) {
+const is = (roles) => {
     return async (req, res, next) => {
         if (roles === undefined) {
             return next();
@@ -49,10 +49,10 @@ export function is(roles) {
             error: `Você não tem permissão. Só para: ${roles}`,
         });
     };
-}
+};
 
 // can(['create_content', 'delete_content'])
-export function can(permissions) {
+const can = (permissions) => {
     return async (req, res, next) => {
         if (permissions === undefined) {
             return next();
@@ -98,4 +98,6 @@ export function can(permissions) {
             error: `Você não tem permissão. Só para: ${permissions}`,
         });
     };
-}
+};
+
+module.exports = { is, can };
