@@ -7,18 +7,14 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
-    "@adonisjs/generic-exceptions": "^3.0.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-handlebars": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.15",
-    "macroable": "^4.0.2",
     "nodemailer": "^6.4.6",
     "nodemailer-express-handlebars": "^3.3.0",
-    "path-to-regexp": "^6.1.0",
     "pg": "^7.18.2",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.5",
